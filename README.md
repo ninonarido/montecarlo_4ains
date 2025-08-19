@@ -297,7 +297,7 @@ G.add_edges_from([(1, 2), (2, 3), (3, 1)])
 
 ### Additional Resources
 
-- **Books**: "Modeling and Simulation in Python" by Nino Narido
+- **Books**: "Modeling and Simulation in Python"
 - **Courses**: Quantitative Method: Modeling and Simulation
 - **Documentation**: Official docs for NumPy, SciPy, Matplotlib
 - **Examples**: GitHub repositories with simulation examples
