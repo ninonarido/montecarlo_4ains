@@ -1,0 +1,66 @@
+from scipy.optimize import linprog
+import numpy as np
+
+# Objective function coefficients (negative for maximization)
+c = [-30, -20]  # We negate for maximization
+
+# Inequality constraints Ax <= b
+A = [
+    [2, 1],   # Labor constraint: 2A + B <= 100
+    [1, 2]    # Material constraint: A + 2B <= 80
+]
+b = [100, 80]
+
+# Bounds for variables (A >= 0, B >= 0)
+bounds = [(0, None), (0, None)]
+
+# Solve
+result = linprog(c, A_ub=A, b_ub=b, bounds=bounds, method='highs')
+
+if result.success:
+    print("Optimal solution found:")
+    print(f"Product A: {result.x[0]:.2f} units")
+    print(f"Product B: {result.x[1]:.2f} units")
+    print(f"Maximum profit: ${-result.fun:.2f}")
+    
+    # Verify constraints
+    labor_used = 2*result.x[0] + result.x[1]
+    material_used = result.x[0] + 2*result.x[1]
+    
+    print(f"\nResource utilization:")
+    print(f"Labor: {labor_used:.2f}/100 hours")
+    print(f"Material: {material_used:.2f}/80 units")
+else:
+    print("No optimal solution found")
+
+# Graphical visualization
+import matplotlib.pyplot as plt
+
+# Create feasible region
+A_vals = np.linspace(0, 50, 100)
+B_vals = np.linspace(0, 50, 100)
+
+plt.figure(figsize=(10, 8))
+
+# Plot constraints
+B1 = 100 - 2*A_vals  # Labor constraint: B <= 100 - 2A
+B2 = (80 - A_vals)/2  # Material constraint: B <= (80 - A)/2
+
+plt.plot(A_vals, B1, 'r-', label='Labor constraint: 2A + B ≤ 100')
+plt.plot(A_vals, B2, 'b-', label='Material constraint: A + 2B ≤ 80')
+
+# Fill feasible region
+plt.fill_between(A_vals, 0, np.minimum(B1, B2), 
+                where=(np.minimum(B1, B2) >= 0), alpha=0.3, color='green')
+
+# Plot optimal point
+plt.plot(result.x[0], result.x[1], 'ro', markersize=10, label='Optimal solution')
+
+plt.xlim(0, 50)
+plt.ylim(0, 50)
+plt.xlabel('Product A')
+plt.ylabel('Product B')
+plt.title('Linear Programming Solution')
+plt.legend()
+plt.grid(True)
+plt.show()
